@@ -19,6 +19,21 @@ from prepare import MAX_SEQ_LEN, TIME_BUDGET, Tokenizer, evaluate_bpb, make_data
 os.environ["HF_HUB_DISABLE_PROGRESS_BARS"] = "1"
 
 
+def get_default_final_eval_batch_size():
+    override = os.getenv("FINAL_EVAL_BATCH_SIZE")
+    if override is not None:
+        return int(override)
+
+    try:
+        mem_bytes = os.sysconf("SC_PAGE_SIZE") * os.sysconf("SC_PHYS_PAGES")
+    except (AttributeError, ValueError, OSError):
+        mem_bytes = None
+
+    if mem_bytes is not None and mem_bytes <= 16 * 1024**3:
+        return 64
+    return 256
+
+
 @dataclass
 class GPTConfig:
     sequence_len: int = 2048
@@ -375,7 +390,7 @@ FINAL_LR_FRAC = 0.0
 # Model size
 DEPTH = 4
 DEVICE_BATCH_SIZE = 16
-FINAL_EVAL_BATCH_SIZE = int(os.getenv("FINAL_EVAL_BATCH_SIZE", "256"))
+FINAL_EVAL_BATCH_SIZE = get_default_final_eval_batch_size()
 STARTUP_EXCLUDE_STEPS = 1
 
 
