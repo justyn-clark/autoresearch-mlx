@@ -16,11 +16,14 @@ curl -LsSf https://astral.sh/uv/install.sh | sh
 uv sync
 
 # one-time data + tokenizer prep
+# default: downloads 10 training shards plus the pinned validation shard
 uv run prepare.py
 
 # run one 5-minute training experiment
 uv run train.py
 ```
+
+Prep stores data and tokenizer artifacts under `~/.cache/autoresearch/`. The tokenizer step needs at least 2 shards total available (1 train + the pinned validation shard).
 
 Then point Claude Code or another coding agent at `program.md` and let it run the loop.
 
@@ -62,7 +65,8 @@ The Mac Mini result matters because it did not just rediscover the same exact re
 
 - **MLX instead of PyTorch/CUDA.** Native Apple Silicon training with unified memory.
 - **AdamW-only public path.** This public `train.py` keeps the default path simple. The long Mac Mini run above explored a Muon variant in the working port, but that branch is not exposed as a public default here.
-- **Smaller eval token budget.** Reduced for faster iteration on Apple Silicon while keeping the same `evaluate_bpb` interface in `prepare.py`.
+- **Smaller eval token budget.** `prepare.py` evaluates on `3 * 524288` validation tokens for faster iteration on Apple Silicon while keeping the same `evaluate_bpb` interface.
+- **Auto-sized final eval batches.** `train.py` now chooses a conservative default final eval batch size based on system memory (`64` on 16 GB-class machines, otherwise `256`). You can override it with `FINAL_EVAL_BATCH_SIZE=<n>`.
 - **Roughly 6-7 minutes per experiment.** Expect 5 minutes of training plus compile and eval overhead.
 - **MFU reporting is placeholder.** There is no Apple Silicon equivalent to the H100 FLOPs reference used upstream.
 
