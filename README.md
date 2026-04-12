@@ -1,5 +1,9 @@
 # autoresearch-mlx
 
+[![Python 3.10+](https://img.shields.io/badge/python-3.10%2B-blue)](https://github.com/justyn-clark/autoresearch-mlx/blob/main/pyproject.toml)
+[![MLX](https://img.shields.io/badge/framework-MLX-orange)](https://github.com/ml-explore/mlx)
+[![License: MIT](https://img.shields.io/github/license/justyn-clark/autoresearch-mlx)](LICENSE)
+
 Apple Silicon (MLX) port of [Karpathy's autoresearch](https://github.com/karpathy/autoresearch).
 
 Full credit to [@karpathy](https://github.com/karpathy) for the core idea: fixed-time autonomous research loops controlled through `program.md`. This port keeps the same basic rules: one mutable `train.py`, one metric (`val_bpb`), a fixed 5-minute training budget, and keep-or-revert via git. It runs natively on Apple Silicon through [MLX](https://github.com/ml-explore/mlx), so there is no PyTorch or CUDA dependency.
